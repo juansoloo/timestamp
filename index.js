@@ -27,7 +27,7 @@ app.get("/api/:date?", function (req, res) {
       const now = new Date();
       const currentUTC = now.toUTCString()
       const currentUNIX = Date.now();
-      res.json({"unix": currentUNIX, "utc": currentUTC})
+      res.json({ unix: currentUNIX, utc: currentUTC })
     } else if (UTCpattern.test(date)) {
       let splitDate = date.split('-')
       let utcDate = new Date(splitDate[0],splitDate[1] - 1,splitDate[2])
@@ -37,7 +37,7 @@ app.get("/api/:date?", function (req, res) {
         throw new Error("Invalid Date")
       }
 
-      res.json({"unix": unixDate, "utc": utcDate.toUTCString()});
+      res.json({ unix : unixDate, utc: utcDate.toUTCString() });
     } else if (UNIXpattern.test(date)){
       let unixToUtc = new Date(date * 1000);
       let utcString = unixToUtc.toUTCString();
@@ -46,7 +46,7 @@ app.get("/api/:date?", function (req, res) {
         throw new Error("Invalid Date")
       }
 
-      res.json({"unix": date, "utc": utcString});
+      res.json({ unix: date, utc: utcString });
     } else {
       throw new Error("Invalid Date")
     }
