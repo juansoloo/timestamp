@@ -19,8 +19,7 @@ app.get("/", function (req, res) {
 });
 
 app.get("/api/:date?", function (req, res) {
-  const date = req.params.date;
-  const UTCpattern = /^\d{4}-\d{2}-\d{2}$/;  // Matches a UTC date format (YYYY-MM-DD)
+  const date = req.params.date; // Matches a UTC date format (YYYY-MM-DD)
   const UNIXpattern = /^-?\d{10,13}$/;      // Matches Unix timestamp (in seconds or milliseconds)
 
   try {
@@ -29,25 +28,22 @@ app.get("/api/:date?", function (req, res) {
       const currentUTC = now.toUTCString();
       const currentUNIX = Date.now();  // This returns the timestamp in milliseconds
       res.json({ unix: currentUNIX, utc: currentUTC });
-    } else if (UTCpattern.test(date)) {
-      // Handling a UTC date string
-      let utcDate = new Date(date);  // Convert the string to a Date object
-      if (isNaN(utcDate)) {
-        throw new Error("Invalid Date");
-      }
-      let unixDate = utcDate.getTime();  // getTime() returns the timestamp in milliseconds
-      res.json({ unix: unixDate, utc: utcDate.toUTCString() });
     } else if (UNIXpattern.test(date)) {
-      // Handling a Unix timestamp
-      let unixDate = parseInt(date, 10);  // Convert to integer (in case the timestamp is a string)
-      let utcString = new Date(unixDate).toUTCString();
+      // Handling a UTC date string
+      let unixDate = parseInt(date,10);
+      let utcString = new Date(unixDate).toUTCString();  // Convert the string to a Date object
       if (isNaN(unixDate)) {
         throw new Error("Invalid Date");
       }
       res.json({ unix: unixDate, utc: utcString });
     } else {
-      throw new Error("Invalid Date");
-    }
+      let utcDate = new Date(date);
+      if (isNaN(utcDate)) {
+        throw new Error("Invalid Date");
+      }
+      let unixDate = utcDate.getTime();
+      res.json({ unix: unixDate, utc: utcDate.toUTCString() });
+    } 
   } catch (err) {
     res.json({ error: err.message });
   }
