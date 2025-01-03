@@ -20,41 +20,38 @@ app.get("/", function (req, res) {
 
 app.get("/api/:date?", function (req, res) {
   const date = req.params.date;
-  const UTCpattern = /^\d{4}-\d{2}-\d{2}$/
-  const UNIXpattern = /^-?\d{10,13}$/
+  const UTCpattern = /^\d{4}-\d{2}-\d{2}$/;  // Matches a UTC date format (YYYY-MM-DD)
+  const UNIXpattern = /^-?\d{10,13}$/;      // Matches Unix timestamp (in seconds or milliseconds)
+
   try {
     if (!date) {
       const now = new Date();
-      const currentUTC = now.toUTCString()
-      const currentUNIX = Date.now();
-      res.json({ unix: currentUNIX, utc: currentUTC })
+      const currentUTC = now.toUTCString();
+      const currentUNIX = Date.now();  // This returns the timestamp in milliseconds
+      res.json({ unix: currentUNIX, utc: currentUTC });
     } else if (UTCpattern.test(date)) {
-      let splitDate = date.split('-')
-      let utcDate = new Date(splitDate[0],splitDate[1] - 1,splitDate[2])
-      let unixDate = utcDate.getTime() / 1000;
-
+      // Handling a UTC date string
+      let utcDate = new Date(date);  // Convert the string to a Date object
       if (isNaN(utcDate)) {
-        throw new Error("Invalid Date")
+        throw new Error("Invalid Date");
       }
-
-      res.json({ unix : unixDate, utc: utcDate.toUTCString() });
-    } else if (UNIXpattern.test(date)){
-      let unixToUtc = new Date(date * 1000);
-      let utcString = unixToUtc.toUTCString();
-
-      if (isNaN(unixToUtc)) {
-        throw new Error("Invalid Date")
+      let unixDate = utcDate.getTime();  // getTime() returns the timestamp in milliseconds
+      res.json({ unix: unixDate, utc: utcDate.toUTCString() });
+    } else if (UNIXpattern.test(date)) {
+      // Handling a Unix timestamp
+      let unixDate = parseInt(date, 10);  // Convert to integer (in case the timestamp is a string)
+      let utcString = new Date(unixDate).toUTCString();
+      if (isNaN(unixDate)) {
+        throw new Error("Invalid Date");
       }
-
-      res.json({ unix: date, utc: utcString });
+      res.json({ unix: unixDate, utc: utcString });
     } else {
-      throw new Error("Invalid Date")
+      throw new Error("Invalid Date");
     }
   } catch (err) {
-    res.json({error: err.message})
+    res.json({ error: err.message });
   }
 });
-
 
 
 // Listen on port set in environment variable or default to 3000
